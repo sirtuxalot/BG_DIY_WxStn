@@ -1,23 +1,8 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-
-BG_WxStn.ino
-
-Banggood "AOQDQDQD ESP8266 Weather Station Kit with Temperature Humidity Atmosphetic Pressure Light Sensor 0.96 Display
-for Arduino IDE IoT Starter" 
-
-Uses libraries from Adafruit, Adi Dax, Sparkfun, Christopher Laws and various individual contributers to the arguino
-labrary ecosystem
-
-Original wifi example file by pileofstuff.ca
-
-Git repo with semi-useful info, that was added to source folder
-https://github.com/GJKJ/WSKS
-
-Revisions:
-11 July 2021: Code clean-up due to my OCD
-26 August 2021: First working sketch
-23 November 2021: Added deep sleep
-
+BG_DIY_WxStn.DeeoSleep
+Author: G. J. Yeomans
+Last Updated: 23 November 2021
+Notes: Added deep sleep
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #define DEBUG 1

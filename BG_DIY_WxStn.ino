@@ -1,25 +1,11 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-
-BG_WxStn.ino
-
-Banggood "AOQDQDQD ESP8266 Weather Station Kit with Temperature Humidity Atmosphetic Pressure Light Sensor 0.96 Display
-for Arduino IDE IoT Starter" 
-
-Uses libraries from Adafruit, Adi Dax, Sparkfun, Christopher Laws and various individual contributers to the arguino
-labrary ecosystem
-
-Original wifi example file by pileofstuff.ca
-
-Git repo with semi-useful info, that was added to source folder
-https://github.com/GJKJ/WSKS
-
-Revisions:
-11 July 2021: Code clean-up due to my OCD
-26 August 2021: First working sketch
-
+BG_DIY_WxStn.ArduinoJson
+Author: G. J. Yeomans
+Last Updated: 26 Nov 2021
+Notes: Added debug code to replace serial.print code in getWX function, add rain sensor code
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-#define DEBUG 0
+#define DEBUG 1
 
 #if DEBUG == 1
 #define debug(x) Serial.print(x)
@@ -32,25 +18,28 @@ Revisions:
 // Libraries
 
 #include <Wire.h>                      // common library for all I2C stuf
-#include <DHT.h>                       // library for DHT11 (https://github.com/adafruit/DHT-sensor-library)
+#include <DHT.h>                       // library for DHT11
 #include <SFE_BMP180.h>                // library for BMP180
 #include <BH1750.h>                    // library for BH1750 (AKA GY-30)
-#include <ESP8266WiFi.h>               // library for web server
+#include <ESP8266WiFi.h>               // library for wireless access
+#include <ESP8266WebServer.h>          // library for web server
+#include <ArduinoJson.h>               // library for JSON 
 
 // Defines
 
 #define DHTPIN 14                      // pin for DHT11
 #define DHTTYPE DHT11                  // name for DHT11
 DHT dht(DHTPIN, DHTTYPE);              // initialize DHT11 sensor
+#define RainSensor A0                  // pin for LM393 Rain Sensor
 #define ALTITUDE 171.0                 // Altitude of Lock Haven, PA in meters
 SFE_BMP180 pressure;                   // name for BMP180 
 BH1750 lightMeter;                     // name for BH1750 (AKA GY-30)
 const char* ssid = "XXXXXXXXXX";       // SSID of wireless network
 const char* password = "XXXXXXXXXX";   // Password for wireless network
-WiFiServer espServer(80);              // HTTP port
-IPAddress ip(192, 168, X, X);          // IP address of device
-IPAddress gateway(192, 168, X, 1);     // Gateway IP address
+IPAddress ip(192, 168, 254, 128);      // IP address of device
+IPAddress gateway(192, 168, 254, 1);   // Gateway IP address
 IPAddress subnet(255, 255, 255, 0);    // Network Subnet Mask
+ESP8266WebServer server;
 
 // Variables
 
@@ -58,6 +47,7 @@ float temp = 0;
 float humid = 0;
 float pres = 0;
 int light = 0;
+int moisture = 0;
 
 void setup() {
 
@@ -88,7 +78,7 @@ void setup() {
   Serial.println(ssid);
   Serial.println();
   Serial.println("Starting ESP8266 Web Server...");
-  espServer.begin();                   // Start the HTTP web Server
+  server.begin();                      // Start the HTTP web Server
   Serial.println("ESP8266 Web Server Started");
   Serial.println();
   Serial.print("The URL of ESP8266 Web Server is: ");
@@ -97,125 +87,68 @@ void setup() {
   Serial.println();
   Serial.println("Use the above URL in your Browser to access ESP8266 Web Server\n");
 
+  // Setup default route
+  server.on("/",default_route);
+  server.on("/getWX",getWX);
 }
 
 void loop() {
-  // Wait a few seconds between measurements.
-  delay(5000);
+  server.handleClient();
+}
+
+void getWX() {
+
   // read DHT11 sensor
+  debugln();
   float humid = dht.readHumidity();
+  debug("humidity: ");
+  debug(humid);
+  debugln();
+
   // Read temperature as Fahrenheit (isFahrenheit = true)
   float temp = dht.readTemperature(true);
+  debug("current temperature: ");
+  debug(temp);
+  debugln();
+
   // Check if any reads failed and exit early (to try again).
   if (isnan(humid) || isnan(temp)) {
-	  Serial.println(F("Failed to read from DHT sensor!"));
+    Serial.println(F("Failed to read from DHT sensor!"));
     return;
   }
+
   // Compute heat index in Fahrenheit (the default)
   float hif = dht.computeHeatIndex(temp, humid);
+  debug("heat index: ");
+  debug(hif);
+  debugln();
+
+  // read LM393 Rain Sensor
+  moisture = analogRead(RainSensor);
+  debug("moisture: ");
+  debug(moisture);
+  debugln();
 
   // read BMP180 sensor (we could optinally use this for temperature)
   char status;
   double T, P, pres, a;
-//  pressure.startTemperature();
-//  pressure.getTemperature(T);
-//  pressure.startPressure(3);
-//  pressure.getPressure(P, T);
-//  pres = P;
-
-  // Loop here getting pressure readings every 10 seconds.
-
-  // If you want sea-level-compensated pressure, as used in weather reports,
-  // you will need to know the altitude at which your measurements are taken.
-  // We're using a constant called ALTITUDE in this sketch:
-  
-  debugln();
-  debug("provided altitude: ");
-  debug(ALTITUDE,0);
-  debug(" meters, ");
-  debug(ALTITUDE*3.28084,0);
-  debugln(" feet");
-  
-  // If you want to measure altitude, and not pressure, you will instead need
-  // to provide a known baseline pressure. This is shown at the end of the sketch.
-
-  // You must first get a temperature measurement to perform a pressure reading.
-  
-  // Start a temperature measurement:
-  // If request is successful, the number of ms to wait is returned.
-  // If request is unsuccessful, 0 is returned.
 
   status = pressure.startTemperature();
-  if (status != 0)
-  {
-    // Wait for the measurement to complete:
+  if (status != 0) {
     delay(status);
-
-    // Retrieve the completed temperature measurement:
-    // Note that the measurement is stored in the variable T.
-    // Function returns 1 if successful, 0 if failure.
-
     status = pressure.getTemperature(T);
-    if (status != 0)
-    {
-      // Print out the measurement:
-      debug("temperature: ");
-      debug(T,2);
-      debug(" deg C, ");
-      debug((9.0/5.0)*T+32.0,2);
-      debugln(" deg F");
-      
-      // Start a pressure measurement:
-      // The parameter is the oversampling setting, from 0 to 3 (highest res, longest wait).
-      // If request is successful, the number of ms to wait is returned.
-      // If request is unsuccessful, 0 is returned.
-
+    if (status != 0) {
       status = pressure.startPressure(3);
-      if (status != 0)
-      {
-        // Wait for the measurement to complete:
+      if (status != 0) {
         delay(status);
-
-        // Retrieve the completed pressure measurement:
-        // Note that the measurement is stored in the variable P.
-        // Note also that the function requires the previous temperature measurement (T).
-        // (If temperature is stable, you can do one temperature measurement for a number of pressure measurements.)
-        // Function returns 1 if successful, 0 if failure.
-
         status = pressure.getPressure(P,T);
-        if (status != 0)
-        {
-          // Print out the measurement:
-          debug("absolute pressure: ");
-          debug(P,2);
-          debug(" mb, ");
-          debug(P*0.0295333727,2);
-          debugln(" inHg");
-
-          // The pressure sensor returns abolute pressure, which varies with altitude.
-          // To remove the effects of altitude, use the sealevel function and your current altitude.
-          // This number is commonly used in weather reports.
-          // Parameters: P = absolute pressure in mb, ALTITUDE = current altitude in m.
-          // Result: p0 = sea-level compensated pressure in mb
-
+        if (status != 0) {
           pres = pressure.sealevel(P,ALTITUDE);
           debug("relative (sea-level) pressure: ");
-          debug(pres,2);
+          debug(pres);
           debug(" mb, ");
-          debug(pres*0.0295333727,2);
+          debug(pres*0.0295333727);
           debugln(" inHg");
-
-          // On the other hand, if you want to determine your altitude from the pressure reading,
-          // use the altitude function along with a baseline pressure (sea-level or other).
-          // Parameters: P = absolute pressure in mb, p0 = baseline pressure in mb.
-          // Result: a = altitude in m.
-
-          a = pressure.altitude(P,p0);
-          debug("computed altitude: ");
-          debug(a,0);
-          debug(" meters, ");
-          debug(a*3.28084,0);
-          debugln(" feet");
         }
         else debugln("error retrieving pressure measurement\n");
       }
@@ -227,41 +160,28 @@ void loop() {
 
   // read BH1750 sensor
   uint16_t light = lightMeter.readLightLevel();
+  debug("light level: ");
+  debug(light);
+  debugln();
 
-  //web server stuff
+  // build and send json response as a string
+  DynamicJsonDocument WX_Response(128);
 
-  WiFiClient client = espServer.available(); /* Check if a client is available */
-  if(!client)
-  {
-    return;
-  }
 
-  /* HTTP Response in the form of HTML Web Page */
-  client.println("HTTP/1.1 200 OK");
-  client.println("Content-Type: text/html");
-  client.println(); //  IMPORTANT
-  client.println("<!DOCTYPE HTML>");
-  client.println("<html>");
-  client.println("<head>");
-  client.println("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">");
-  client.println("<link rel=\"icon\" href=\"data:,\">");
-  /* CSS Styling for Buttons and Web Page */
-  client.println("<style>");
-  client.println("html { font-family: Courier New; display: inline-block; margin: 0px auto; text-align: center;}");
-  client.println("text-decoration: none; font-size: 25px; margin: 2px; cursor: pointer;}");
-  client.println("</style>");
-  client.println("</head>");
-  
-  /* The main body of the Web Page */
-  client.println("<body>");
-  client.println("<h2>yer basic weather station</h2>");
-  client.print("<p>Temperature: </p>");
-  client.println(temp);
-  client.print("<p>Humidity: </p>");
-  client.println(humid);
-  client.print("<p>Pressure:  </p>");
-  client.println(pres,2);
-  client.print("<p>Light: </p>");
-  client.println(light);
-  
+  WX_Response["temperature"] = temp;
+  WX_Response["humidity"] = humid;
+  WX_Response["heat_index"] = hif;
+  WX_Response["pressure"] = pres;
+  WX_Response["light"] = light;
+  WX_Response["moisture"] = moisture;
+
+  Serial.print(F("Stream..."));
+  String buf;
+  serializeJson(WX_Response,buf);
+
+  server.send(200,F("application/json"),buf);
+}
+
+void default_route() {
+  server.send(200,"text/json","{\"name\": \"Hello world\"}");
 }

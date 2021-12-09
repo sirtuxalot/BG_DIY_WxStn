@@ -1,8 +1,8 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-BG_DIY_WxStn.StringJson
+BG_DIY_WxStn.ino
 Author: G. J. Yeomans
-Last Updated: 26 Nov 2021
-Notes: Added debug code to replace serial.print code in getWX function, add rain sensor code
+Last Update: 16 Oct 2021
+Notes: Working file
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #define DEBUG 1
@@ -17,28 +17,33 @@ Notes: Added debug code to replace serial.print code in getWX function, add rain
 
 // Libraries
 
-#include <Wire.h>                      // common library for all I2C stuf
-#include <DHT.h>                       // library for DHT11
-#include <SFE_BMP180.h>                // library for BMP180
-#include <BH1750.h>                    // library for BH1750 (AKA GY-30)
-#include <ESP8266WiFi.h>               // library for wireless access
-#include <ESP8266WebServer.h>          // library for web server
+#include <Wire.h>                                // common library for all I2C stuf
+#include <DHT.h>                                 // library for DHT11
+#include <SFE_BMP180.h>                          // library for BMP180
+#include <BH1750.h>                              // library for BH1750 (AKA GY-30)
+#include <ESP8266WiFi.h>                         // library for web server
+//#include <secrets.h>                             // thingspeak secrets header
+#include <ThingSpeak.h>                          // always include thingspeak header file after other header files and custom macros
 
 // Defines
 
-#define DHTPIN 14                      // pin for DHT11
-#define DHTTYPE DHT11                  // name for DHT11
-DHT dht(DHTPIN, DHTTYPE);              // initialize DHT11 sensor
-#define RainSensor A0                  // pin for LM393 Rain Sensor
-#define ALTITUDE 171.0                 // Altitude of Lock Haven, PA in meters
-SFE_BMP180 pressure;                   // name for BMP180 
-BH1750 lightMeter;                     // name for BH1750 (AKA GY-30)
-const char* ssid = "XXXXXXXXXX";       // SSID of wireless network
-const char* password = "XXXXXXXXXX";   // Password for wireless network
-IPAddress ip(192, 168, 254, 128);      // IP address of device
-IPAddress gateway(192, 168, 254, 1);   // Gateway IP address
-IPAddress subnet(255, 255, 255, 0);    // Network Subnet Mask
-ESP8266WebServer server;
+#define DHTPIN 14                                // pin for DHT11
+#define DHTTYPE DHT11                            // name for DHT11
+DHT dht(DHTPIN, DHTTYPE);                        // initialize DHT11 sensor
+#define RainSensor A0                            // pin for LM393 Rain Sensor
+#define ALTITUDE 171.0                           // Altitude of Lock Haven, PA in meters
+SFE_BMP180 pressure;                             // name for BMP180 
+BH1750 lightMeter;                               // name for BH1750 (AKA GY-30)
+const char* ssid = "XXXXXXXXXX";                 // SSID of wireless network
+const char* password = "XXXXXXXXXX";             // Password for wireless network
+WiFiClient client;                               // use as wifi client
+IPAddress ip(192, 168, 254, 128);                // IP address of device
+IPAddress gateway(192, 168, 254, 1);             // Gateway IP address
+IPAddress subnet(255, 255, 255, 0);              // Network Subnet Mask
+
+unsigned long myChannelNumber = XXXXXX;
+const char* myWriteAPIKey = "XXXXXXXXXXXXXXXX";  // ThingSpeak Write key
+const char* myReadAPIKey = "XXXXXXXXXXXXXXXX";   // ThingSpeak Read key
 
 // Variables
 
@@ -60,14 +65,14 @@ void setup() {
   lightMeter.begin();
 
   // connect to wireless network
-  Serial.begin(115200);                // Begin Serial Communication with 115200 Baud Rate
+  Serial.begin(115200);                          // Begin Serial Communication with 115200 Baud Rate
   Serial.println();
   Serial.print("Connecting to: ");
   Serial.println(ssid);
-  WiFi.mode(WIFI_STA);                 // Configure ESP8266 in STA Mode
-  WiFi.config(ip, gateway, subnet);    // Setup IP Addressing of device
-  WiFi.begin(ssid, password);          // Connect to Wi-Fi based on above SSID and Password
-  while(WiFi.status() != WL_CONNECTED) // Loop validating connection to wireless network
+  WiFi.mode(WIFI_STA);                           // Configure ESP8266 in STA Mode
+  WiFi.config(ip, gateway, subnet);              // Setup IP Addressing of device
+  WiFi.begin(ssid, password);                    // Connect to Wi-Fi based on above SSID and Password
+  while(WiFi.status() != WL_CONNECTED)           // Loop validating connection to wireless network
   {
     Serial.print("*");
     delay(500);
@@ -76,36 +81,25 @@ void setup() {
   Serial.print("Connected to Wi-Fi: ");
   Serial.println(ssid);
   Serial.println();
-  Serial.println("Starting ESP8266 Web Server...");
-  server.begin();                      // Start the HTTP web Server
-  Serial.println("ESP8266 Web Server Started");
-  Serial.println();
-  Serial.print("The URL of ESP8266 Web Server is: ");
-  Serial.print("http://");
-  Serial.println(WiFi.localIP());
-  Serial.println();
-  Serial.println("Use the above URL in your Browser to access ESP8266 Web Server\n");
-
-  // Setup default route
-  server.on("/",default_route);
-  server.on("/getWX",getWX);
+  ThingSpeak.begin(client);                      // Initialize ThingSpeak
+  Serial.println("ThingSpeak client initialized...");
+  
+  WxStats();
+  ESP.deepSleep(300e6);
 }
 
-void loop() {
-  server.handleClient();
-}
-
-void getWX() {
-
+void WxStats() {
   // read DHT11 sensor
   debugln();
   float humid = dht.readHumidity();
+  ThingSpeak.setField(1, humid);
   debug("humidity: ");
   debug(humid);
   debugln();
 
   // Read temperature as Fahrenheit (isFahrenheit = true)
   float temp = dht.readTemperature(true);
+  ThingSpeak.setField(2, temp);
   debug("current temperature: ");
   debug(temp);
   debugln();
@@ -118,13 +112,24 @@ void getWX() {
 
   // Compute heat index in Fahrenheit (the default)
   float hif = dht.computeHeatIndex(temp, humid);
+  ThingSpeak.setField(3, hif);
   debug("heat index: ");
   debug(hif);
   debugln();
 
   // read LM393 Rain Sensor
   moisture = analogRead(RainSensor);
+  ThingSpeak.setField(4, moisture);
   debug("moisture: ");
+  if (moisture <= 100) {
+    debug("Heavy Rain - ");
+    if (moisture > 100 and moisture <= 400) {
+      debug("Raining - ");
+      if (moisture > 400 and moisture <= 800) {
+        debug("Light Rain - ");
+      }
+    }
+  }
   debug(moisture);
   debugln();
 
@@ -132,22 +137,58 @@ void getWX() {
   char status;
   double T, P, pres, a;
 
+  // Loop here getting pressure readings every 10 seconds.
+  debugln();
+  debug("provided altitude: ");
+  debug(ALTITUDE);
+  debug(" meters, ");
+  debug(ALTITUDE*3.28084);
+  debugln(" feet");
+
+  // If you want to measure altitude, and not pressure, you will instead need
+  // to provide a known baseline pressure.
   status = pressure.startTemperature();
   if (status != 0) {
+    // Wait for the measurement to complete:
     delay(status);
+
     status = pressure.getTemperature(T);
     if (status != 0) {
+      // Print out the measurement:
+      debug("temperature: ");
+      debug(T);
+      debug(" deg C, ");
+      debug((9.0/5.0)*T+32.0);
+      debugln(" deg F");
+    
       status = pressure.startPressure(3);
       if (status != 0) {
+        // Wait for the measurement to complete:
         delay(status);
+
         status = pressure.getPressure(P,T);
         if (status != 0) {
-          pres = pressure.sealevel(P,ALTITUDE);
+          // Print out the measurement:
+          debug("absolute pressure: ");
+          debug(P);
+          debug(" mb, ");
+          debug(P*0.0295333727);
+          debugln(" inHg");
+
+          float pres = pressure.sealevel(P,ALTITUDE);
+          ThingSpeak.setField(5, pres);
           debug("relative (sea-level) pressure: ");
           debug(pres);
           debug(" mb, ");
           debug(pres*0.0295333727);
           debugln(" inHg");
+
+          a = pressure.altitude(P,pres);
+          debug("computed altitude: ");
+          debug(a);
+          debug(" meters, ");
+          debug(a*3.28084);
+          debugln(" feet");
         }
         else debugln("error retrieving pressure measurement\n");
       }
@@ -159,30 +200,20 @@ void getWX() {
 
   // read BH1750 sensor
   uint16_t light = lightMeter.readLightLevel();
+  ThingSpeak.setField(6, light);
   debug("light level: ");
   debug(light);
   debugln();
 
-  // build and send json response as a string
-
-  String WX_Response = "{";
-  WX_Response += "\"temperature\": ";
-  WX_Response += temp;
-  WX_Response += "\, \"humidity\": ";
-  WX_Response += humid;
-  WX_Response += "\, \"heat_index\": ";
-  WX_Response += hif;
-  WX_Response += "\, \"pressure\": ";
-  WX_Response += pres;
-  WX_Response += "\, \"light\": ";
-  WX_Response += light;
-  WX_Response += "\, \"moisture\": ";
-  WX_Response += moisture;
-  WX_Response += "}";
-
-  server.send(200,"text/json",WX_Response);
+  // write to the ThingSpeak channel
+  int ErrorCode = ThingSpeak.writeFields(myChannelNumber, myWriteAPIKey);
+  if(ErrorCode == 200) {
+    Serial.println("Channel update successful.");
+  }
+  else {
+    Serial.println("Problem updating channel. HTTP error code " + String(ErrorCode));
+  }  
 }
 
-void default_route() {
-  server.send(200,"text/json","{\"name\": \"Hello world\"}");
+void loop() {
 }

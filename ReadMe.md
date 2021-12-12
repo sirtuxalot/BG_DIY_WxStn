@@ -24,4 +24,5 @@ Revisions:
 - 26 August 2021: First working sketch
 - 27 August 2021: More code clean-up and replace web output with json output
 - 20 November 2021: Added rain sensor with assistance from [here](https://www.youtube.com/watch?v=2layMOhue7M&t)
+- 23 November 2021: Added deep sleep with assistance from [here](https://randomnerdtutorials.com/esp8266-deep-sleep-with-arduino-ide/)
 - 26 Nobember 2021: Code preped for ThingSpeak testing

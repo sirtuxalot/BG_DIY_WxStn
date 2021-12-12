@@ -1,8 +1,8 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 BG_DIY_WxStn.ino
 Author: G. J. Yeomans
-Last Update: 16 Oct 2021
-Notes: Working file
+Last Update: 26 Nov 2021
+Notes: ThingSpeak for testing
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #define DEBUG 1

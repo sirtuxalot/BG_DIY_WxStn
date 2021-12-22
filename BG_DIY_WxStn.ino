@@ -1,8 +1,8 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-BG_DIY_WxStn.StringJson
+BG_DIY_WxStn.ino (StringJson)
 Author: G. J. Yeomans
-Last Updated: 26 Nov 2021
-Notes: Added debug code to replace serial.print code in getWX function, add rain sensor code
+Last Updated: 22 Dec 2021
+Notes: Standardize format of sketch constants
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #define DEBUG 1
@@ -26,15 +26,15 @@ Notes: Added debug code to replace serial.print code in getWX function, add rain
 
 // Defines
 
-#define DHTPIN 14                      // pin for DHT11
-#define DHTTYPE DHT11                  // name for DHT11
+const int DHTPIN {14};                 // pin for DHT11
+const char DHTTYPE {DHT11};            // name for DHT11
 DHT dht(DHTPIN, DHTTYPE);              // initialize DHT11 sensor
-#define RainSensor A0                  // pin for LM393 Rain Sensor
-#define ALTITUDE 171.0                 // Altitude of Lock Haven, PA in meters
+const char RainSensor {A0};            // pin for LM393 Rain Sensor
+const float ALTITUDE {171.0};          // Altitude of my location in meters
 SFE_BMP180 pressure;                   // name for BMP180 
 BH1750 lightMeter;                     // name for BH1750 (AKA GY-30)
-const char* ssid = "XXXXXXXXXX";       // SSID of wireless network
-const char* password = "XXXXXXXXXX";   // Password for wireless network
+const char* ssid {"XXXXXXXXXX"};       // SSID of wireless network
+const char* password {"XXXXXXXXXX"};   // Password for wireless network
 IPAddress ip(192, 168, 254, 128);      // IP address of device
 IPAddress gateway(192, 168, 254, 1);   // Gateway IP address
 IPAddress subnet(255, 255, 255, 0);    // Network Subnet Mask

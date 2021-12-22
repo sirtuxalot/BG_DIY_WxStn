@@ -36,9 +36,9 @@ SFE_BMP180 pressure;                   // name for BMP180
 BH1750 lightMeter;                     // name for BH1750 (AKA GY-30)
 const char* ssid {"XXXXXXXXXX"};       // SSID of wireless network
 const char* password {"XXXXXXXXXX"};   // Password for wireless network
-IPAddress ip(192, 168, 254, 128);      // IP address of device
-IPAddress gateway(192, 168, 254, 1);   // Gateway IP address
-IPAddress subnet(255, 255, 255, 0);    // Network Subnet Mask
+IPAddress ip(###, ###, ###, ###);      // IP address of your device
+IPAddress gateway(###, ###, ###, ###); // Gateway IP address of your network
+IPAddress subnet(###, ###, ###, ###);  // Network Subnet Mask of your network
 ESP8266WebServer server;
 
 // Variables

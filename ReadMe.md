@@ -9,9 +9,9 @@ Common Downloaded Libraries
 - ESP8266 [https://github.com/esp8266/Arduino](https://github.com/esp8266/Arduino)
 
 Settings you will need to change for your station
-- const char* ssid = "XXXXXXXXXX";       // SSID of your wireless network
-- const char* password = "XXXXXXXXXX";   // Password for your wireless network
-- #defi#define ALTITUDE 171.0            // Altitude of your location (in meters)
+- const char* ssid {"XXXXXXXXXX"};       // SSID of your wireless network
+- const char* password {"XXXXXXXXXX"};   // Password for your wireless network
+- const float ALTITUDE {171.0};          // Altitude of your location (in meters)
 - IPAddress ip(###, ###, ###, ###);      // IP address of your device, or remove completely for DHCP
 - IPAddress gateway(###, ###, ###, ###); // Gateway IP address of your network, or remove completely for DHCP
 - IPAddress subnet(###, ###, ###, ###);  // Network Subnet Mask of your network, or remove completely for DHCP

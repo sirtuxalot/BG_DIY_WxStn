@@ -9,14 +9,16 @@ Common Downloaded Libraries
 - ESP8266 [https://github.com/esp8266/Arduino](https://github.com/esp8266/Arduino)
 
 Settings you will need to change for your station
-- const char* ssid = "XXXXXXXXXX";       // SSID of your wireless network
-- const char* password = "XXXXXXXXXX";   // Password for your wireless network
-- \#defi#define ALTITUDE 171.0            // Altitude of your location (in meters)
-- IPAddress ip(192, 168, 254, 128);      // IP address of your device, or remove completely for DHCP
-- IPAddress gateway(192, 168, 254, 1);   // Gateway IP address of your network, or remove completely for DHCP
-- IPAddress subnet(255, 255, 255, 0);    // Network Subnet Mask of your network, or remove completely for DHCP
+- const char* ssid {"XXXXXXXXXX"};       // SSID of your wireless network
+- const char* password {"XXXXXXXXXX"};   // Password for your wireless network
+- \#defi#define ALTITUDE 171.0           // Altitude of your location (in meters)
+- IPAddress ip(###, ###, ###, ###);      // IP address of your device, or remove completely for DHCP
+- IPAddress gateway(###, ###, ###, ###); // Gateway IP address of your network, or remove completely for DHCP
+- IPAddress subnet(###, ###, ###, ###);  // Network Subnet Mask of your network, or remove completely for DHCP
 
 Revisions:
 - 11 July 2021: Code clean-up due to my OCD
 - 26 August 2021: First working sketch
 - 27 August 2021: More code clean-up and replace web output with json output
+- 23 November 2021: Replace Serial(ln) with Debug(ln) to allow enable/disable of debug content in serial monitor
+- 22 December 2021: Standardize format of constants with the sketch

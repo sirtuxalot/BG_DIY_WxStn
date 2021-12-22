@@ -23,3 +23,5 @@ Revisions:
 - 28 August 2021: Utilize Arduino Json library to construct json output
 - 20 November 2021: Added rain sensor with assistance from [here](https://www.youtube.com/watch?v=2layMOhue7M&t)
 - 23 November 2021: Added deep sleep with assistance from [here](https://randomnerdtutorials.com/esp8266-deep-sleep-with-arduino-ide/)
+- 23 November 2021: Replace Serial(ln) with Debug(ln) to allow enable/disable of debug content in serial monitor
+- 22 December 2021: Standardize format of constants with the sketch

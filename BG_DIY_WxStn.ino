@@ -1,6 +1,6 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 BG_DIY_WxStn.ino (DeepSleep)
-Author: G. J. Yeomans
+Author: sirtuxalot@gmail.com
 Last Updated: 22 Dec 2021
 Notes: Standardize format of sketch constants
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */

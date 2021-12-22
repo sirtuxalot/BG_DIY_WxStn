@@ -1,8 +1,8 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-BG_DIY_WxStn.DeeoSleep
+BG_DIY_WxStn.ino (DeepSleep)
 Author: G. J. Yeomans
-Last Updated: 23 November 2021
-Notes: Added deep sleep
+Last Updated: 22 Dec 2021
+Notes: Standardize format of sketch constants
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #define DEBUG 1
@@ -25,19 +25,19 @@ Notes: Added deep sleep
 
 // Defines
 
-#define DHTPIN 14                      // pin for DHT11
-#define DHTTYPE DHT11                  // name for DHT11
+const int DHTPIN {14};                 // pin for DHT11
+const char DHTTYPE {DHT11};            // name for DHT11
 DHT dht(DHTPIN, DHTTYPE);              // initialize DHT11 sensor
-#define ALTITUDE 171.0                 // Altitude of Lock Haven, PA in meters
+const char RainSensor {A0};            // pin for LM393 Rain Sensor
+const float ALTITUDE {171.0};          // Altitude of my location in meters
 SFE_BMP180 pressure;                   // name for BMP180 
 BH1750 lightMeter;                     // name for BH1750 (AKA GY-30)
-const char* ssid = "XXXXXXXXXX";       // SSID of wireless network
-const char* password = "XXXXXXXXXX";   // Password for wireless network
+const char* ssid {"XXXXXXXXXX"};       // SSID of wireless network
+const char* password {"XXXXXXXXXX"};   // Password for wireless network
 WiFiClient client;                     // use as wifi client
 IPAddress ip(192, 168, 254, 128);      // IP address of device
 IPAddress gateway(192, 168, 254, 1);   // Gateway IP address
 IPAddress subnet(255, 255, 255, 0);    // Network Subnet Mask
-#define RainSensor A0                  // pin for LM393 Rain Sensor
 
 // Variables
 

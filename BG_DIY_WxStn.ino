@@ -2,7 +2,8 @@
 BG_DIY_WxStn.ino (DeepSleep)
 Author: sirtuxalot@gmail.com
 Last Updated: 22 Dec 2021
-Notes: Standardize format of sketch constants
+Notes: This sketch uses deep sleep feature of ESP8266 and will be the basis of the eventual external Weather Station
+using MQTT to send data to grafana server
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #define DEBUG 1
@@ -21,6 +22,7 @@ Notes: Standardize format of sketch constants
 #include <DHT.h>                       // library for DHT11
 #include <SFE_BMP180.h>                // library for BMP180
 #include <BH1750.h>                    // library for BH1750 (AKA GY-30)
+#include <Adafruit_SI1145.h>           // library for SI1145
 #include <ESP8266WiFi.h>               // library for web server
 
 // Defines
@@ -32,6 +34,7 @@ const char RainSensor {A0};            // pin for LM393 Rain Sensor
 const float ALTITUDE {171.0};          // Altitude of my location in meters
 SFE_BMP180 pressure;                   // name for BMP180 
 BH1750 lightMeter;                     // name for BH1750 (AKA GY-30)
+Adafruit_SI1145 uv;                    // name for SI1145
 const char* ssid {"XXXXXXXXXX"};       // SSID of wireless network
 const char* password {"XXXXXXXXXX"};   // Password for wireless network
 WiFiClient client;                     // use as wifi client
@@ -47,6 +50,7 @@ float pres = 0;
 int light = 0;
 unsigned long LastEntry;
 int RainSensorValue = 0;
+float unIndex = 0;
 
 void setup() {
 
@@ -58,6 +62,9 @@ void setup() {
 
   // for BH1750 (AKA GY-30)
   lightMeter.begin();
+
+  // for SI1145
+  uv.begin();
 
   // connect to wireless network
   Serial.begin(115200);                // Begin Serial Communication with 115200 Baud Rate
@@ -77,7 +84,7 @@ void setup() {
   Serial.println(ssid);
   Serial.println();
   Serial.println("Starting ESP8266 Web Server...");
-  espServer.begin();                   // Start the HTTP web Server
+  espServer.begin();                   // Start the HTTP web server
   Serial.println("ESP8266 Web Server Started");
   Serial.println();
   Serial.print("The URL of ESP8266 Web Server is: ");
@@ -129,9 +136,16 @@ void WxStats() {
     }
   }
   debug(RainSensorValue);
+  debugln();
+
+  // read SI1145
+  float uvIndex = uv.readUV();
+  unIndex /= 100.0;
+  debug("uv index: ");
+  debug(uvIndex);
+  debugln();
 
   // Loop here getting pressure readings every 10 seconds.
-  debugln();
   debug("provided altitude: ");
   debug(ALTITUDE);
   debug(" meters, ");

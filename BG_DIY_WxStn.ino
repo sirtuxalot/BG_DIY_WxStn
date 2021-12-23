@@ -2,7 +2,8 @@
 BG_DIY_WxStn.ino (StringJson)
 Author: sirtuxalot@gmail.com
 Last Updated: 22 Dec 2021
-Notes: Standardize format of sketch constants
+Notes: This sketch is designed to run external Weather Station and output data using JSON format using standard 
+Formating.
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #define DEBUG 1
@@ -21,6 +22,7 @@ Notes: Standardize format of sketch constants
 #include <DHT.h>                       // library for DHT11
 #include <SFE_BMP180.h>                // library for BMP180
 #include <BH1750.h>                    // library for BH1750 (AKA GY-30)
+#include <Adafruit_SI1145.h>           // library for SI1145
 #include <ESP8266WiFi.h>               // library for wireless access
 #include <ESP8266WebServer.h>          // library for web server
 
@@ -33,6 +35,7 @@ const char RainSensor {A0};            // pin for LM393 Rain Sensor
 const float ALTITUDE {171.0};          // Altitude of my location in meters
 SFE_BMP180 pressure;                   // name for BMP180 
 BH1750 lightMeter;                     // name for BH1750 (AKA GY-30)
+Adafruit_SI1145 uv;                    // name for SI1145
 const char* ssid {"XXXXXXXXXX"};       // SSID of wireless network
 const char* password {"XXXXXXXXXX"};   // Password for wireless network
 IPAddress ip(###, ###, ###, ###);      // IP address of your device
@@ -47,6 +50,7 @@ float humid = 0;
 float pres = 0;
 int light = 0;
 int moisture = 0;
+float unIndex = 0;
 
 void setup() {
 
@@ -58,6 +62,9 @@ void setup() {
 
   // for BH1750 (AKA GY-30)
   lightMeter.begin();
+
+  // for SI1145
+  uv.begin();
 
   // connect to wireless network
   Serial.begin(115200);                // Begin Serial Communication with 115200 Baud Rate
@@ -128,6 +135,13 @@ void getWX() {
   debug(moisture);
   debugln();
 
+  // read SI1145
+  float uvIndex = uv.readUV();
+  unIndex /= 100.0;
+  debug("uv index: ");
+  debug(uvIndex);
+  debugln();
+
   // read BMP180 sensor (we could optinally use this for temperature)
   char status;
   double T, P, pres, a;
@@ -178,6 +192,8 @@ void getWX() {
   WX_Response += light;
   WX_Response += "\, \"moisture\": ";
   WX_Response += moisture;
+  WX_Response += "\, \"uv_index\": ";
+  WX_Response += uvIndex;
   WX_Response += "}";
 
   server.send(200,"text/json",WX_Response);

@@ -3,10 +3,11 @@
 Branch ReadMe, for full details see ReadMe in master branch
 
 Common Downloaded Libraries
-- DHT11 - [https://github.com/adafruit/DHT-sensor-library](https://github.com/adafruit/DHT-sensor-library)
-- BMP180 - [https://github.com/LowPowerLab/SFE_BMP180.git](https://github.com/LowPowerLab/SFE_BMP180.git)
-- BH1750 (AKA GY-30) - [https://github.com/claws/BH1750.git](https://github.com/claws/BH1750.git)
-- ESP8266 [https://github.com/esp8266/Arduino](https://github.com/esp8266/Arduino)
+- DHT11 - [https://github.com/adafruit/DHT-sensor-library](https://github.com/adafruit/DHT-sensor-library.git)
+- BMP180 - [https://github.com/LowPowerLab/SFE_BMP180](https://github.com/LowPowerLab/SFE_BMP180.git)
+- BH1750 (AKA GY-30) - [https://github.com/claws/BH1750](https://github.com/claws/BH1750.git)
+- SI1145 - [https://github.com/adafruit/Adafruit_SI1145_Library](https://github.com/adafruit/Adafruit_SI1145_Library.git)
+- ESP8266 [https://github.com/esp8266/Arduino](https://github.com/esp8266/Arduino.git)
 
 Settings you will need to change for your station
 - const char* ssid {"XXXXXXXXXX"};       // SSID of your wireless network
@@ -21,4 +22,4 @@ Revisions:
 - 26 August 2021: First working sketch
 - 27 August 2021: More code clean-up and replace web output with json output
 - 23 November 2021: Replace Serial(ln) with Debug(ln) to allow enable/disable of debug content in serial monitor
-- 22 December 2021: Standardize format of constants with the sketch
+- 22 December 2021: Standardize format of constants with the sketch.  Added code for SI1145 UV sensor.

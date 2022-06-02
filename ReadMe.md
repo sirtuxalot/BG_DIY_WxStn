@@ -7,15 +7,12 @@ Common Downloaded Libraries
 - BMP180 - [https://github.com/LowPowerLab/SFE_BMP180](https://github.com/LowPowerLab/SFE_BMP180.git)
 - BH1750 (AKA GY-30) - [https://github.com/claws/BH1750](https://github.com/claws/BH1750.git)
 - SI1145 - [https://github.com/adafruit/Adafruit_SI1145_Library](https://github.com/adafruit/Adafruit_SI1145_Library.git)
-- ESP8266 [https://github.com/esp8266/Arduino](https://github.com/esp8266/Arduino.git)
+- ESP8266 - [https://github.com/esp8266/Arduino](https://github.com/esp8266/Arduino.git)
+- InfluxDB - [https://github.com/tobiasschuerg/InfluxDB-Client-for-Arduino.git](https://github.com/tobiasschuerg/InfluxDB-Client-for-Arduino.git)
+- WiFi Manager - [https://github.com/tzapu/WiFiManager.git](https://github.com/tzapu/WiFiManager.git)
 
 Settings you will need to change for your station
-- const char* ssid {"XXXXXXXXXX"};       // SSID of your wireless network
-- const char* password {"XXXXXXXXXX"};   // Password for your wireless network
 - const float ALTITUDE {171.0};          // Altitude of your location (in meters)
-- IPAddress ip(###, ###, ###, ###);      // IP address of your device, or remove completely for DHCP
-- IPAddress gateway(###, ###, ###, ###); // Gateway IP address of your network, or remove completely for DHCP
-- IPAddress subnet(###, ###, ###, ###);  // Network Subnet Mask of your network, or remove completely for DHCP
 
 Revisions:
 - 11 July 2021: Code clean-up due to my OCD
@@ -25,3 +22,4 @@ Revisions:
 - 20 November 2021: Added rain sensor with assistance from [here](https://www.youtube.com/watch?v=2layMOhue7M&t)
 - 23 November 2021: Added deep sleep with assistance from [here](https://randomnerdtutorials.com/esp8266-deep-sleep-with-arduino-ide/). Replace Serial(ln) with Debug(ln) to allow enable/disable of debug content in serial monitor
 - 22 December 2021: Standardize format of constants with the sketch.  Added code for SI1145 UV sensor
+- 2 June 2022: Add libraries and code to send data to influxdb and wifimanager to simply network setup

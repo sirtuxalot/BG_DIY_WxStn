@@ -1,9 +1,8 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-BG_DIY_WxStn.ino (DeepSleep)
+BG_DIY_WxStn.ino (InfluxDB)
 Author: sirtuxalot@gmail.com
-Last Updated: 22 Dec 2021
-Notes: This sketch uses deep sleep feature of ESP8266 and will be the basis of the eventual external Weather Station
-using MQTT to send data to grafana server
+Last Updated: 02 Jun 2022
+Notes: Adding code to utilize InfluxDb and WifiManager
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #define DEBUG 1
@@ -23,7 +22,8 @@ using MQTT to send data to grafana server
 #include <SFE_BMP180.h>                // library for BMP180
 #include <BH1750.h>                    // library for BH1750 (AKA GY-30)
 #include <Adafruit_SI1145.h>           // library for SI1145
-#include <ESP8266WiFi.h>               // library for web server
+#include <ESP8266WiFi.h>               // library for web access
+#include <InfluxDbClient.h>            // library for sending data to influxdb
 
 // Defines
 
@@ -35,12 +35,12 @@ const float ALTITUDE {171.0};          // Altitude of my location in meters
 SFE_BMP180 pressure;                   // name for BMP180 
 BH1750 lightMeter;                     // name for BH1750 (AKA GY-30)
 Adafruit_SI1145 uv;                    // name for SI1145
-const char* ssid {"XXXXXXXXXX"};       // SSID of wireless network
-const char* password {"XXXXXXXXXX"};   // Password for wireless network
 WiFiClient client;                     // use as wifi client
-IPAddress ip(###, ###, ###, ###);      // IP address of your device
-IPAddress gateway(###, ###, ###, ###); // Gateway IP address of your network
-IPAddress subnet(###, ###, ###, ###);  // Network Subnet Mask of your network
+#define INFLUXDB_URL "influxdb"         // InfluxDB  server url. Don't use localhost, always server name or ip address.
+//#define INFLUXDB_TOKEN "toked-id"    // InfluxDB 2 server or cloud API authentication token (Use: InfluxDB UI -> Load Data -> Tokens -> <select token>)
+//#define INFLUXDB_ORG "org"           // InfluxDB 2 organization id (Use: InfluxDB UI -> Settings -> Profile -> <name under tile> )
+//#define INFLUXDB_BUCKET "bucket"     // InfluxDB 2 bucket name (Use: InfluxDB UI -> Load Data -> Buckets)
+#define INFLUXDB_DB_NAME "collectd"    // InfluxDB v1 database name
 
 // Variables
 

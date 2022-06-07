@@ -24,6 +24,7 @@ Notes: Adding code to utilize InfluxDb and WifiManager
 #include <Adafruit_SI1145.h>           // library for SI1145
 #include <ESP8266WiFi.h>               // library for web access
 #include <InfluxDbClient.h>            // library for sending data to influxdb
+#include <WiFiManager.h>               // library for managing wifi connectivity
 
 // Defines
 
@@ -69,30 +70,19 @@ void setup() {
   // connect to wireless network
   Serial.begin(115200);                // Begin Serial Communication with 115200 Baud Rate
   Serial.println();
-  Serial.print("Connecting to: ");
-  Serial.println(ssid);
   WiFi.mode(WIFI_STA);                 // Configure ESP8266 in STA Mode
-  WiFi.config(ip, gateway, subnet);    // Setup IP Addressing of device
-  WiFi.begin(ssid, password);          // Connect to Wi-Fi based on above SSID and Password
-  while(WiFi.status() != WL_CONNECTED) // Loop validating connection to wireless network
-  {
-    Serial.print("*");
-    delay(500);
+  WiFiManager wfm;                     // Initialize WiFiManager
+  //wfm.resetSettings                  // Uncomment to reset all settings when testing
+  bool result;
+  result = wfm.autoConnect("WxStnAP");
+  if (!result) {
+    Serial.println("Failed to Connect!");
+    //ESP.Restart();
+  } else {
+    Serial.print("Connecting to AP! ");
+    //Serial.println(ssid);
   }
   Serial.println();
-  Serial.print("Connected to Wi-Fi: ");
-  Serial.println(ssid);
-  Serial.println();
-  Serial.println("Starting ESP8266 Web Server...");
-  espServer.begin();                   // Start the HTTP web server
-  Serial.println("ESP8266 Web Server Started");
-  Serial.println();
-  Serial.print("The URL of ESP8266 Web Server is: ");
-  Serial.print("http://");
-  Serial.println(WiFi.localIP());
-  Serial.println();
-  Serial.println("Use the above URL in your Browser to access ESP8266 Web Server\n");
-  
   WxStats();
   ESP.deepSleep(300e6);
 }

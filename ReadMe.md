@@ -8,6 +8,7 @@ Common Downloaded Libraries
 - BH1750 (AKA GY-30) - [https://github.com/claws/BH1750](https://github.com/claws/BH1750.git)
 - SI1145 - [https://github.com/adafruit/Adafruit_SI1145_Library](https://github.com/adafruit/Adafruit_SI1145_Library.git)
 - ESP8266 [https://github.com/esp8266/Arduino](https://github.com/esp8266/Arduino.git)
+- WiFi Manager - [https://github.com/tzapu/WiFiManager.git](https://github.com/tzapu/WiFiManager.git)
 
 Additional Branch Libraries
 - ArduinoJSON - [https://github.com/bblanchon/ArduinoJson.git](https://github.com/bblanchon/ArduinoJson.git)
@@ -23,3 +24,4 @@ Revisions:
 - 20 November 2021: Added rain sensor with assistance from [here](https://www.youtube.com/watch?v=2layMOhue7M&t)
 - 23 November 2021: Replace Serial(ln) with Debug(ln) to allow enable/disable of debug content in serial monitor
 - 22 December 2021: Standardize format of constants with the sketch.  Added code for SI1145 UV sensor.
+- 7 June 2022: Add library and code to utilize wifimanager to simply network setup (Untested on this branch, but copied from tested InfluxDB branch)

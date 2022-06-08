@@ -3,7 +3,7 @@ BG_DIY_WxStn.ino (DeepSleep)
 Author: sirtuxalot@gmail.com
 Last Updated: 22 Dec 2021
 Notes: This sketch uses deep sleep feature of ESP8266 and will be the basis of the eventual external Weather Station
-using MQTT to send data to grafana server
+using InfluxDB to send data to grafana server
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #define DEBUG 1
@@ -24,6 +24,7 @@ using MQTT to send data to grafana server
 #include <BH1750.h>                    // library for BH1750 (AKA GY-30)
 #include <Adafruit_SI1145.h>           // library for SI1145
 #include <ESP8266WiFi.h>               // library for web server
+#include <WiFiManager.h>               // library for managing wifi connectivity
 
 // Defines
 
@@ -35,12 +36,7 @@ const float ALTITUDE {171.0};          // Altitude of my location in meters
 SFE_BMP180 pressure;                   // name for BMP180 
 BH1750 lightMeter;                     // name for BH1750 (AKA GY-30)
 Adafruit_SI1145 uv;                    // name for SI1145
-const char* ssid {"XXXXXXXXXX"};       // SSID of wireless network
-const char* password {"XXXXXXXXXX"};   // Password for wireless network
 WiFiClient client;                     // use as wifi client
-IPAddress ip(###, ###, ###, ###);      // IP address of your device
-IPAddress gateway(###, ###, ###, ###); // Gateway IP address of your network
-IPAddress subnet(###, ###, ###, ###);  // Network Subnet Mask of your network
 
 // Variables
 
@@ -69,21 +65,20 @@ void setup() {
   // connect to wireless network
   Serial.begin(115200);                // Begin Serial Communication with 115200 Baud Rate
   Serial.println();
-  Serial.print("Connecting to: ");
-  Serial.println(ssid);
   WiFi.mode(WIFI_STA);                 // Configure ESP8266 in STA Mode
-  WiFi.config(ip, gateway, subnet);    // Setup IP Addressing of device
-  WiFi.begin(ssid, password);          // Connect to Wi-Fi based on above SSID and Password
-  while(WiFi.status() != WL_CONNECTED) // Loop validating connection to wireless network
-  {
-    Serial.print("*");
-    delay(500);
+  WiFiManager wfm;                     // Initialize WiFiManager
+  //wfm.resetSettings();               // Uncomment to reset all settings when testing
+  wfm.setHostname("wx_station");       // Set hostname
+  bool result;
+  result = wfm.autoConnect("WxStnAP");
+  if (!result) {
+    Serial.println("Failed to Connect!");
+    //ESP.Restart();
+  } else {
+    Serial.print("Connecting to AP! ");
+    //Serial.println(ssid);
   }
   Serial.println();
-  Serial.print("Connected to Wi-Fi: ");
-  Serial.println(ssid);
-  Serial.println();
-  Serial.println("Starting ESP8266 Web Server...");
   espServer.begin();                   // Start the HTTP web server
   Serial.println("ESP8266 Web Server Started");
   Serial.println();
@@ -91,8 +86,7 @@ void setup() {
   Serial.print("http://");
   Serial.println(WiFi.localIP());
   Serial.println();
-  Serial.println("Use the above URL in your Browser to access ESP8266 Web Server\n");
-  
+  Serial.println("Use the above URL in your Browser to access ESP8266 Web Server\n");  
   WxStats();
   ESP.deepSleep(300e6);
 }

@@ -8,6 +8,7 @@ Common Downloaded Libraries
 - BH1750 (AKA GY-30) - [https://github.com/claws/BH1750](https://github.com/claws/BH1750.git)
 - SI1145 - [https://github.com/adafruit/Adafruit_SI1145_Library](https://github.com/adafruit/Adafruit_SI1145_Library.git)
 - ESP8266 [https://github.com/esp8266/Arduino](https://github.com/esp8266/Arduino.git)
+- WiFi Manager - [https://github.com/tzapu/WiFiManager.git](https://github.com/tzapu/WiFiManager.git)
 
 Settings you will need to change for your station
 - const char* ssid {"XXXXXXXXXX"};       // SSID of your wireless network
@@ -23,3 +24,4 @@ Revisions:
 - 27 August 2021: More code clean-up and replace web output with json output
 - 23 November 2021: Replace Serial(ln) with Debug(ln) to allow enable/disable of debug content in serial monitor
 - 22 December 2021: Standardize format of constants with the sketch.  Added code for SI1145 UV sensor.
+- 7 June 2022: Add libraries and code to send data to influxdb and wifimanager to simply network setup (Untested on this branch, but copied from tested InfluxDB branch

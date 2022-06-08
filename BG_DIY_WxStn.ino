@@ -24,6 +24,7 @@ Notes: Standardize format of sketch constants
 #include <ESP8266WiFi.h>                         // library for web server
 //#include <secrets.h>                             // thingspeak secrets header
 #include <ThingSpeak.h>                          // always include thingspeak header file after other header files and custom macros
+#include <WiFiManager.h>                         // library for managing wifi connectivity
 
 // Defines
 
@@ -34,12 +35,7 @@ const char RainSensor {A0};                      // pin for LM393 Rain Sensor
 const float ALTITUDE {171.0};                    // Altitude of Lock Haven, PA in meters
 SFE_BMP180 pressure;                             // name for BMP180 
 BH1750 lightMeter;                               // name for BH1750 (AKA GY-30)
-const char* ssid {"XXXXXXXXXX"};                 // SSID of wireless network
-const char* password {"XXXXXXXXXX"};             // Password for wireless network
 WiFiClient client;                               // use as wifi client
-IPAddress ip(###, ###, ###, ###);                // IP address of your device
-IPAddress gateway(###, ###, ###, ###);           // Gateway IP address of your network
-IPAddress subnet(###, ###, ###, ###);            // Network Subnet Mask of your network
 const unsigned long myChannelNumber {111111};    // ThingSpeak Channel ID
 const char* myWriteAPIKey {"XXXXXXXXXXXXXXXX"};  // ThingSpeak Write key
 const char* myReadAPIKey {"XXXXXXXXXXXXXXXX"};   // ThingSpeak Read key
@@ -66,19 +62,19 @@ void setup() {
   // connect to wireless network
   Serial.begin(115200);                          // Begin Serial Communication with 115200 Baud Rate
   Serial.println();
-  Serial.print("Connecting to: ");
-  Serial.println(ssid);
-  WiFi.mode(WIFI_STA);                           // Configure ESP8266 in STA Mode
-  WiFi.config(ip, gateway, subnet);              // Setup IP Addressing of device
-  WiFi.begin(ssid, password);                    // Connect to Wi-Fi based on above SSID and Password
-  while(WiFi.status() != WL_CONNECTED)           // Loop validating connection to wireless network
-  {
-    Serial.print("*");
-    delay(500);
+  WiFi.mode(WIFI_STA);                 // Configure ESP8266 in STA Mode
+  WiFiManager wfm;                     // Initialize WiFiManager
+  //wfm.resetSettings();               // Uncomment to reset all settings when testing
+  wfm.setHostname("wx_station");       // Set hostname
+  bool result;
+  result = wfm.autoConnect("WxStnAP");
+  if (!result) {
+    Serial.println("Failed to Connect!");
+    //ESP.Restart();
+  } else {
+    Serial.print("Connecting to AP! ");
+    //Serial.println(ssid);
   }
-  Serial.println();
-  Serial.print("Connected to Wi-Fi: ");
-  Serial.println(ssid);
   Serial.println();
   ThingSpeak.begin(client);                      // Initialize ThingSpeak
   Serial.println("ThingSpeak client initialized...");

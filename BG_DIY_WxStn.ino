@@ -72,7 +72,8 @@ void setup() {
   Serial.println();
   WiFi.mode(WIFI_STA);                 // Configure ESP8266 in STA Mode
   WiFiManager wfm;                     // Initialize WiFiManager
-  //wfm.resetSettings                  // Uncomment to reset all settings when testing
+  wfm.resetSettings();               // Uncomment to reset all settings when testing
+  wfm.setHostname("wx_station");       // Set hostname
   bool result;
   result = wfm.autoConnect("WxStnAP");
   if (!result) {

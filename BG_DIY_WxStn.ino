@@ -26,6 +26,7 @@ library.
 #include <ESP8266WiFi.h>               // library for wireless access
 #include <ESP8266WebServer.h>          // library for web server
 #include <ArduinoJson.h>               // library for JSON 
+#include <WiFiManager.h>               // library for managing wifi connectivity
 
 // Defines
 
@@ -37,11 +38,6 @@ const float ALTITUDE {171.0};          // Altitude of my location in meters
 SFE_BMP180 pressure;                   // name for BMP180 
 BH1750 lightMeter;                     // name for BH1750 (AKA GY-30)
 Adafruit_SI1145 uv;                    // name for SI1145
-const char* ssid {"XXXXXXXXXX"};       // SSID of wireless network
-const char* password {"XXXXXXXXXX"};   // Password for wireless network
-IPAddress ip(###, ###, ###, ###);      // IP address of your device
-IPAddress gateway(###, ###, ###, ###); // Gateway IP address of your network
-IPAddress subnet(###, ###, ###, ###);  // Network Subnet Mask of your network
 ESP8266WebServer server;
 
 // Variables
@@ -70,24 +66,22 @@ void setup() {
   // connect to wireless network
   Serial.begin(115200);                // Begin Serial Communication with 115200 Baud Rate
   Serial.println();
-  Serial.print("Connecting to: ");
-  Serial.println(ssid);
   WiFi.mode(WIFI_STA);                 // Configure ESP8266 in STA Mode
-  WiFi.config(ip, gateway, subnet);    // Setup IP Addressing of device
-  WiFi.begin(ssid, password);          // Connect to Wi-Fi based on above SSID and Password
-  while(WiFi.status() != WL_CONNECTED) // Loop validating connection to wireless network
-  {
-    Serial.print("*");
-    delay(500);
+  WiFiManager wfm;                     // Initialize WiFiManager
+  //wfm.resetSettings();               // Uncomment to reset all settings when testing
+  wfm.setHostname("wx_station");       // Set hostname
+  bool result;
+  result = wfm.autoConnect("WxStnAP");
+  if (!result) {
+    Serial.println("Failed to Connect!");
+    //ESP.Restart();
+  } else {
+    Serial.print("Connecting to AP! ");
+    //Serial.println(ssid);
   }
-  Serial.println();
-  Serial.print("Connected to Wi-Fi: ");
-  Serial.println(ssid);
   Serial.println();
   Serial.println("Starting ESP8266 Web Server...");
   server.begin();                      // Start the HTTP web Server
-  Serial.println("ESP8266 Web Server Started");
-  Serial.println();
   Serial.print("The URL of ESP8266 Web Server is: ");
   Serial.print("http://");
   Serial.println(WiFi.localIP());

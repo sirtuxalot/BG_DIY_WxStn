@@ -1,7 +1,7 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 BG_DIY_WxStn.ino (InfluxDB)
 Author: sirtuxalot@gmail.com
-Last Updated: 02 Jun 2022
+Last Updated: 07 Jun 2022
 Notes: Adding code to utilize InfluxDb and WifiManager
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 

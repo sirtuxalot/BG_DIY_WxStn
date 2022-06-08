@@ -22,4 +22,4 @@ Revisions:
 - 20 November 2021: Added rain sensor with assistance from [here](https://www.youtube.com/watch?v=2layMOhue7M&t)
 - 23 November 2021: Added deep sleep with assistance from [here](https://randomnerdtutorials.com/esp8266-deep-sleep-with-arduino-ide/). Replace Serial(ln) with Debug(ln) to allow enable/disable of debug content in serial monitor
 - 22 December 2021: Standardize format of constants with the sketch.  Added code for SI1145 UV sensor
-- 2 June 2022: Add libraries and code to send data to influxdb and wifimanager to simply network setup
+- 7 June 2022: Add libraries and code to send data to influxdb and wifimanager to simply network setup

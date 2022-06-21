@@ -50,7 +50,7 @@ float humid = 0;
 float pres = 0;
 int light = 0;
 int RainSensorValue = 0;
-float unIndex = 0;
+float uvIndex = 0;
 
 // Setup connection to InfluxDB instance (v1)
 InfluxDBClient client(INFLUXDB_URL, INFLUXDB_DB_NAME);
@@ -147,8 +147,8 @@ void WxStats() {
 
   // read SI1145
   float uvIndex = uv.readUV();
-  unIndex /= 100.0;
-  sensor.addField("uvindex",unIndex);
+  uvIndex /= 100.0;
+  sensor.addField("uvindex",uvIndex);
   debug("uv index: ");
   debug(uvIndex);
   debugln();

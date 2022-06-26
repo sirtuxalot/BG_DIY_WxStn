@@ -9,7 +9,7 @@ Common Downloaded Libraries
 - SI1145 - [https://github.com/adafruit/Adafruit_SI1145_Library](https://github.com/adafruit/Adafruit_SI1145_Library.git)
 - ESP8266 - [https://github.com/esp8266/Arduino](https://github.com/esp8266/Arduino.git)
 - InfluxDB - [https://github.com/tobiasschuerg/InfluxDB-Client-for-Arduino.git](https://github.com/tobiasschuerg/InfluxDB-Client-for-Arduino.git)
-- WiFi Manager - [https://github.com/tzapu/WiFiManager.git](https://github.com/tzapu/WiFiManager.git)
+- WiFi Manager - [https://github.com/tzapu/WiFiManager](https://github.com/tzapu/WiFiManager.git)
 
 Settings you will need to change for your station
 - const float ALTITUDE {171.0};                       // Altitude of your location (in meters)
